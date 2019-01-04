@@ -17,8 +17,8 @@ public class Application {
 						/*.expression(filter.isEmpty())
 							.expression(true)
 						.end()*/
-						.begin()
-							.begin()
+						.expression(true)
+							.expression(true)
 								.addLike("login", "asd", parameters)
 								.and()
 								.addLike(" name", "qwe", parameters)
@@ -34,9 +34,7 @@ public class Application {
 						.addOrder(SqlConstatnt.ASC, "login", "name")
 						.addLimit(10)
 						.build();
-		//begin && end -> expression && end 
+		//check condition
 		System.out.println(sql);
-		System.out.println();
-		System.out.println(parameters.toString());
 	}
 }

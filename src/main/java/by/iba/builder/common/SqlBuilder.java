@@ -33,8 +33,8 @@ public class SqlBuilder {
 		return this;
 	}
 	
-	public SqlBuilder begin(){
-		sql += " ( ";
+	public SqlBuilder expression(boolean condition){
+			sql += " ( ";
 		return this;
 	}
 	
