@@ -1,13 +1,13 @@
 package by.iba.sql;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import by.iba.sql.builder.ExpressionBuilder;
+import javax.naming.OperationNotSupportedException;
+
 import by.iba.sql.builder.SqlBuilder;
-import by.iba.sql.common.SqlConstatnt;
 
 public class Application {
 	
@@ -17,64 +17,45 @@ public class Application {
 		boolean filter1 = true;
 		boolean filter2 = true;
 		
-		List<Object> listIn = new ArrayList<Object>();
-		listIn.add("first");
-		listIn.add("second");
-		listIn.add("third");
-		
-		//listSQL
-		//SELECT * FROM USERS WHERE
-		//operator - null, addCompare
-		//operator - and , expression - >
-								// expression ->
-									//null, addLiked
-									//and, addLike
-								//end
-							//end
-		
-		//select 								//select
-		//null	    	-->validate()			//expression
-	//and										//expression	
-		//expression							//addlike
-		//expression
-		//null
-	//or
-		//addlike
-		
-		//select * from users where ((user like %Artem%))
-		
-		
-		/*
-		String sql = new SqlBuilder()
-						.sql("SELECT * FROM USERS WHERE ")
-						.addCompare(SqlConstatnt.EQUALS, "password", "456", parameters)
-						.and()
-						.expression(filter1)
-							.expression(filter2)
-								.sql("ID != 2 AND ID != 3")
-								.addLike("login", "123", parameters)
-								.and()
-								.addLike("name", "qwe", parameters)
-							.end()
-							.or(filter2)
-							.addLike("surname", "123", parameters)
-							.or()
-							.in("login2", parameters, "qwe", "asd", "zxc")
+		List<String> listIn = Arrays.asList("val1", "val2", "val3");		
+		String sql;
+		try {
+			sql = new SqlBuilder()
+							.sql("SELECT * FROM USERS WHERE ")
+							.addLike("name", "qwe", "nameparam", parameters)
 							.and()
-							.in("login3", parameters, listIn)
-						.end()
-						.addOrder(SqlConstatnt.ASC, "as","zx")
-						.addLimit(10)
-						.build();*/
-		
-		List<Object> list = new ExpressionBuilder()
-									.addLike("name", "qwe", parameters)
-									.or()
-									.in("login2", parameters, "qwe", "asd", "zxc")
-									.getList();
-		
-		for (Object object : list) {
-			System.out.println(object.toString());
+							.addLike("name", "qwe", "nameparam", parameters)
+							.validate()
+							.build();
+//							.addCompare(SqlConstatnt.EQUALS, "password", "456", "pass", parameters)
+//							.and()
+//							.expression(filter1)
+//								.expression(filter2)
+//									.addLike("login", "123", "loginparam", parameters)
+//									.and()
+//									.addLike("name", "qwe", "nameparam", parameters)
+//								.end()
+//								.or()
+//								.addLike("surname", "123", "surnameParam", parameters)
+//								.or()
+//								.in("login2", "lParam", parameters)
+//								.and()
+//								.in("login3", "l3Param", parameters, listIn)
+//								.in("login4", "l3Param", parameters, listIn)
+//								.and()
+//								.in("login5", "l3Param", parameters, listIn)
+//							.end()
+//							.in("login", "login", parameters, (Object[]) null)
+//							.and()
+//							.in("login", "login", parameters, (Object[]) null)
+//							.or()
+//							.in("login", "login", parameters, listIn)
+//							.or()
+							
+			System.out.println(sql);
+		} catch (OperationNotSupportedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

@@ -41,7 +41,7 @@
               <maxIdleTime>30000</maxIdleTime>
             </connector>
           </connectors>
-          <webAppSourceDirectory>${project.build.directory}/${pom.artifactId}-${pom.version}</webAppSourceDirectory>
+          <webAppSourceDirectory>${project.build.directory}/${pom.artifactId}-${pom.v`ersion}</webAppSourceDirectory>
           <contextPath>/</contextPath>
         </configuration>
       </plugin>
@@ -54,6 +54,18 @@
       <artifactId>[the artifact id of the block to be mounted]</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency-->
+    
+    <dependency>
+	    <groupId>org.springframework.security</groupId>
+	    <artifactId>spring-security-core</artifactId>
+	    <version>5.1.2.RELEASE</version>
+	</dependency>
+	
+	 <dependency>
+	    <groupId>org.springframework.security</groupId>
+	    <artifactId>spring-security-config</artifactId>
+	    <version>5.1.2.RELEASE</version>
+	</dependency>
     
   </dependencies>
 
