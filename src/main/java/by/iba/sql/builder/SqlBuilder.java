@@ -1,5 +1,6 @@
 package by.iba.sql.builder;
 
+import java.sql.SQLSyntaxErrorException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,17 +12,16 @@ import by.iba.sql.util.StringUtil;
 public class SqlBuilder {
 
 	private StringBuffer sql;
-	private ExpressionBuilder expressionBuilder;
- 	protected static List<Object> expressionsList = new ArrayList<Object>();
-	
+	private SqlBuilder sqlBuilder;
+	protected List<Object> expressionsList;
 
 	public SqlBuilder() {
 		sql = new StringBuffer();
+		expressionsList = new ArrayList<Object>();
 	}
 
-	public SqlBuilder(ExpressionBuilder expressionBuilder) {
-		this.expressionBuilder = expressionBuilder;
-		this.sql = new StringBuffer();
+	public SqlBuilder(SqlBuilder sqlBuilder) {
+		this.sqlBuilder = sqlBuilder;
 	}
 
 	public ExpressionBuilder sql(String sql) {
@@ -30,23 +30,44 @@ public class SqlBuilder {
 	}
 
 	public String getSql() {
-		return sql.toString();
+		return sql != null ? sql.toString() : null;
 	}
 
+	public SqlBuilder addLimit(int limit) {
 
-	public SqlBuilder validate() throws OperationNotSupportedException {
+		expressionsList.add(String.format(" FETCH FIRST %d ROWS ONLY ", limit));
 
-		
+		return this;
+	}
+
+	public SqlBuilder addOrder(SqlConstatnt operator, String... fields) {
+
+		if (fields == null || fields.length == 0) {
+			throw new IllegalArgumentException("Field couldn't be null");
+		}
+		int size = fields.length - 1;
+		expressionsList.add(" ORDER BY ");
+		for (int i = 0; i < size; i++) {
+			expressionsList.add(String.format(" %s, ", fields[i]));
+		}
+		expressionsList.add(fields[size] + " " + operator.getValue());
+
+		return this;
+	}
+	
+	public SqlBuilder validate() throws OperationNotSupportedException,
+			SQLSyntaxErrorException {
+
 		for (int i = expressionsList.size() - 1; i > 0; i--) {
 			Object el = expressionsList.get(i) != null ? expressionsList.get(i)
 					: "";
-			if (!(el.equals(SqlConstatnt.AND.getValue()) 
-					|| el.equals(SqlConstatnt.OR.getValue()))) {
+			if (!(el.equals(SqlConstatnt.AND.getValue()) || el
+					.equals(SqlConstatnt.OR.getValue()))) {
 				continue;
 			}
-			
+
 			if (i == 0 || i == expressionsList.size() - 1) {
-				throw new OperationNotSupportedException(
+				throw new SQLSyntaxErrorException(
 						"Operator couldn't be first and last element");
 			}
 			boolean removeCondition = false;
@@ -63,15 +84,17 @@ public class SqlBuilder {
 		}
 		return this;
 	}
-	
+
 	public String build() {
+
 		for (Object object : expressionsList) {
-			sql.append(object.toString());
+			sql.append(object);
 		}
+
 		return sql.toString();
 	}
-	
-	public void setExpressionBuilder(ExpressionBuilder expressionBuilder) {
-		this.expressionBuilder = expressionBuilder;
+
+	public SqlBuilder getSqlBuilder() {
+		return sqlBuilder;
 	}
 }

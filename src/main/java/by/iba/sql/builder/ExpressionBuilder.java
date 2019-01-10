@@ -3,87 +3,81 @@ package by.iba.sql.builder;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.OperationNotSupportedException;
-
 import by.iba.sql.common.SqlConstatnt;
 import by.iba.sql.util.StringUtil;
 
 public class ExpressionBuilder extends SqlBuilder {
 
 	private ExpressionBuilder expressionBuilder;
-	private SqlBuilder sqlBuilder;
+	private boolean expressionCondition;
 
-	public ExpressionBuilder(SqlBuilder sqlBuilder) {
-		expressionsList.add(sqlBuilder.getSql());
+	public ExpressionBuilder(OperatorBuilder operatorBuilder) {
+		expressionsList = operatorBuilder.expressionsList;
+		this.expressionBuilder = operatorBuilder.getExpressionBuilder();
 	}
-	
-	private ExpressionBuilder(ExpressionBuilder expressionBuilder) {
+
+	public ExpressionBuilder(ExpressionBuilder expressionBuilder) {
 		this.expressionBuilder = expressionBuilder;
 	}
 
-	public ExpressionBuilder sql(String sql) {
-		expressionsList.add(sql);
-		return this;
-	}
-
-	public OperatorBuilder addLike(String field, String value,
-			String paramName, Map<String, Object> parameters) {
-		if (field == null)
-			throw new IllegalArgumentException("Field couldn't be null");
-		if (value == null || value.isEmpty()){
-			expressionsList.add(null);
+	public ExpressionBuilder(SqlBuilder sqlBuilder) {
+		if (!StringUtil.isEmpty(sqlBuilder.getSql())) {
+			expressionsList.add(sqlBuilder.getSql());
 		}
-		expressionsList.add(" " + field + "  LIKE '%'||:" + paramName
-				+ "||'%' ");
-		parameters.put(paramName, value);
-		return new OperatorBuilder(this);
-	}
-	
-	public SqlBuilder getSqlBuilder() {
-		return sqlBuilder;
 	}
 
 	public ExpressionBuilder expression(boolean condition) {
+		ExpressionBuilder eb = null;
 		if (!condition) {
-			ExpressionBuilder eb = new ExpressionBuilder(this);
+			eb = new ExpressionBuilder(this);
 			return eb;
 		}
 		expressionsList.add(" (");
 		return this;
 	}
 
-	public ExpressionBuilder end() {
-		if (expressionBuilder != null) {
-			expressionsList = expressionBuilder.getList();
-			expressionBuilder = null;
-		} else {
-			expressionsList.add(") ");
-		}
+	public OperatorBuilder addLike(String field, String value,
+			String paramName, Map<String, Object> parameters) {
 
-		return this;
-	}
-
-	public ExpressionBuilder addCompare(SqlConstatnt operator, String field,
-			String value, String paramName, Map<String, Object> parameters) {
-		if (field == null)
+		if (field == null) {
 			throw new IllegalArgumentException("Field couldn't be null");
-		if (value == null || value.isEmpty()){
-			expressionsList.add(null);
-			return this;
 		}
-		expressionsList.add(String.format(" %s %s :%s ", field,
-				operator.getValue(), paramName));
+		if (value == null || value.isEmpty()) {
+			expressionsList.add(null);
+		}
+		expressionsList.add(" " + field + "  LIKE '%'||:" + paramName
+				+ "||'%' ");
 		parameters.put(paramName, value);
-		return this;
+
+		return new OperatorBuilder(this);
 	}
 
-	public ExpressionBuilder in(String field, String paramName,
-			Map<String, Object> parameters, Object... values) {
-		if (field == null)
+	public OperatorBuilder addCompare(SqlConstatnt operator, String field,
+			String value, String paramName, Map<String, Object> parameters) {
+
+		if (field == null) {
 			throw new IllegalArgumentException("Field couldn't be null");
-		if (values == null || values.length == 0){
+		}
+		if (value == null || value.isEmpty()) {
 			expressionsList.add(null);
-			return this;
+		} else {
+			expressionsList.add(String.format(" %s %s :%s ", field,
+					operator.getValue(), paramName));
+			parameters.put(paramName, value);
+		}
+
+		return new OperatorBuilder(this);
+	}
+
+	public OperatorBuilder in(String field, String paramName,
+			Map<String, Object> parameters, Object... values) {
+
+		if (field == null) {
+			throw new IllegalArgumentException("Field couldn't be null");
+		}
+		if (values == null || values.length == 0) {
+			expressionsList.add(null);
+			return new OperatorBuilder(this);
 		}
 		StringBuffer sb = new StringBuffer();
 		sb.append(String.format(" %s IN( ", field));
@@ -95,16 +89,19 @@ public class ExpressionBuilder extends SqlBuilder {
 		sb.append(String.format(" :%s ) ", paramName));
 		expressionsList.add(sb.toString());
 		parameters.put(paramName + size, values[size]);
-		return this;
+
+		return new OperatorBuilder(this);
 	}
 
-	public ExpressionBuilder in(String field, String paramName,
+	public OperatorBuilder in(String field, String paramName,
 			Map<String, Object> parameters, List<Object> values) {
-		if (field == null)
+
+		if (field == null) {
 			throw new IllegalArgumentException("Field couldn't be null");
-		if (values == null || values.size() == 0){
+		}
+		if (values == null || values.size() == 0) {
 			expressionsList.add(null);
-			return this;
+			return new OperatorBuilder(this);
 		}
 		StringBuffer sb = new StringBuffer();
 		sb.append(String.format(" %s IN( ", field));
@@ -116,76 +113,19 @@ public class ExpressionBuilder extends SqlBuilder {
 		sb.append(String.format(" :%s ) ", paramName));
 		expressionsList.add(sb.toString());
 		parameters.put(paramName + size, values.get(size));
-		return this;
-	}
 
-	public ExpressionBuilder and() {
-		expressionsList.add(SqlConstatnt.AND.getValue());
-		return this;
-	}
-
-	public ExpressionBuilder or() {
-		expressionsList.add(SqlConstatnt.OR.getValue());
-		return this;
-	}
-
-	public ExpressionBuilder operator(SqlConstatnt operator) {
-		expressionsList.add(operator.getValue());
-		return this;
-	}
-
-	public ExpressionBuilder addOrder(SqlConstatnt operator, String... fields) {
-		if (fields == null || fields.length == 0)
-			throw new IllegalArgumentException("Field couldn't be null");
-		int size = fields.length - 1;
-		expressionsList.add(" ORDER BY ");
-		for (int i = 0; i < size; i++) {
-			expressionsList.add(String.format(" %s, ", fields[i]));
-		}
-		expressionsList.add(String.format(" %s %s ", fields[size],
-				operator.getValue()));
-		return this;
-	}
-
-	public ExpressionBuilder addLimit(int limit) {
-		expressionsList.add(String.format(" FETCH FIRST %d ROWS ONLY ", limit));
-		return this;
-	}
-
-	public List<Object> getList() {
-		return expressionsList;
+		return new OperatorBuilder(this);
 	}
 
 	public void addToList(Object o) {
 		expressionsList.add(o);
 	}
 
-	public SqlBuilder validate() throws OperationNotSupportedException {
+	public boolean isExpressionCondition() {
+		return expressionCondition;
+	}
 
-		for (int i = expressionsList.size() - 1; i > 0; i--) {
-			Object el = expressionsList.get(i) != null ? expressionsList.get(i)
-					: "";
-			if (!(el.equals(SqlConstatnt.AND.getValue()) 
-					|| el.equals(SqlConstatnt.OR.getValue()))) {
-				continue;
-			}
-			
-			if (i == 0 || i == expressionsList.size() - 1){
-				throw new OperationNotSupportedException(
-						"Operator couldn't be first and last element");
-			}
-			boolean removeCondition = false;
-			if (StringUtil.isEmpty((String) expressionsList.get(i + 1))) {
-				expressionsList.remove(i + 1);
-				expressionsList.remove(i);
-				removeCondition = true;
-			}
-			if (StringUtil.isEmpty((String) expressionsList.get(i - 1))) {
-				if (!removeCondition)
-					expressionsList.remove(i);
-				expressionsList.remove(i - 1);
-			}
-		}
-		return new SqlBuilder(this);
+	public ExpressionBuilder getExpressionBuilder() {
+		return expressionBuilder;
 	}
 }

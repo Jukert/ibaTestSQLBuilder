@@ -1,5 +1,6 @@
 package by.iba.sql;
 
+import java.sql.SQLSyntaxErrorException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 import javax.naming.OperationNotSupportedException;
 
 import by.iba.sql.builder.SqlBuilder;
+import by.iba.sql.common.SqlConstatnt;
 
 public class Application {
 	
@@ -22,40 +24,31 @@ public class Application {
 		try {
 			sql = new SqlBuilder()
 							.sql("SELECT * FROM USERS WHERE ")
-							.addLike("name", "qwe", "nameparam", parameters)
+							.addCompare(SqlConstatnt.EQUALS, "password", "456", "pass", parameters)
 							.and()
-							.addLike("name", "qwe", "nameparam", parameters)
+							.expression(filter1)
+								.expression(filter2)
+									.addLike("login", "123", "loginparam", parameters)
+									.and()
+									.addLike("name", "qwe", "nameparam", parameters)
+								.end()
+								.or()
+								.addLike("surname", "123", "surnameParam", parameters)
+								.end()
+								.or()
+								.in("login2", "lParam", parameters, "AAA", "QQQ")
+								.addLimit(3)
 							.validate()
 							.build();
-//							.addCompare(SqlConstatnt.EQUALS, "password", "456", "pass", parameters)
-//							.and()
-//							.expression(filter1)
-//								.expression(filter2)
-//									.addLike("login", "123", "loginparam", parameters)
-//									.and()
-//									.addLike("name", "qwe", "nameparam", parameters)
-//								.end()
-//								.or()
-//								.addLike("surname", "123", "surnameParam", parameters)
-//								.or()
-//								.in("login2", "lParam", parameters)
-//								.and()
-//								.in("login3", "l3Param", parameters, listIn)
-//								.in("login4", "l3Param", parameters, listIn)
-//								.and()
-//								.in("login5", "l3Param", parameters, listIn)
-//							.end()
-//							.in("login", "login", parameters, (Object[]) null)
-//							.and()
-//							.in("login", "login", parameters, (Object[]) null)
-//							.or()
-//							.in("login", "login", parameters, listIn)
-//							.or()
-							
 			System.out.println(sql);
 		} catch (OperationNotSupportedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (SQLSyntaxErrorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+		System.out.println(parameters.toString());
 	}
 }
