@@ -1,6 +1,7 @@
 package by.iba.sql.builder;
 
-import by.iba.sql.common.SqlConstatnt;
+import by.iba.sql.util.SqlConstatnt;
+
 
 public class OperatorBuilder extends SqlBuilder {
 

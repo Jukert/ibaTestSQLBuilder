@@ -1,25 +1,17 @@
 package by.iba.sql.builder;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-import by.iba.sql.common.SqlConstatnt;
+import by.iba.sql.util.SqlConstatnt;
 import by.iba.sql.util.StringUtil;
 
 public class ExpressionBuilder extends SqlBuilder {
 
-	private ExpressionBuilder expressionBuilder;
-	private boolean expressionCondition;
-
 	public ExpressionBuilder(OperatorBuilder operatorBuilder) {
 		expressionsList = operatorBuilder.expressionsList;
-		this.expressionBuilder = operatorBuilder.getExpressionBuilder();
 	}
-
-	public ExpressionBuilder(ExpressionBuilder expressionBuilder) {
-		this.expressionBuilder = expressionBuilder;
-	}
-
+	
 	public ExpressionBuilder(SqlBuilder sqlBuilder) {
 		if (!StringUtil.isEmpty(sqlBuilder.getSql())) {
 			expressionsList.add(sqlBuilder.getSql());
@@ -36,29 +28,28 @@ public class ExpressionBuilder extends SqlBuilder {
 		return this;
 	}
 
-	public OperatorBuilder addLike(String field, String value,
-			String paramName, Map<String, Object> parameters) {
+	public OperatorBuilder like(String field, String paramName, String value) {
 
 		if (field == null) {
 			throw new IllegalArgumentException("Field couldn't be null");
 		}
 		if (value == null || value.isEmpty()) {
 			expressionsList.add(null);
+		} else {
+			expressionsList.add(" " + field + "  LIKE '%'||:" + paramName
+					+ "||'%' ");
+			parameters.put(paramName, value);
 		}
-		expressionsList.add(" " + field + "  LIKE '%'||:" + paramName
-				+ "||'%' ");
-		parameters.put(paramName, value);
-
 		return new OperatorBuilder(this);
 	}
 
-	public OperatorBuilder addCompare(SqlConstatnt operator, String field,
-			String value, String paramName, Map<String, Object> parameters) {
+	public OperatorBuilder compare(SqlConstatnt operator, String field,
+			String paramName, Object value) {
 
 		if (field == null) {
 			throw new IllegalArgumentException("Field couldn't be null");
 		}
-		if (value == null || value.isEmpty()) {
+		if (value == null) {
 			expressionsList.add(null);
 		} else {
 			expressionsList.add(String.format(" %s %s :%s ", field,
@@ -69,21 +60,22 @@ public class ExpressionBuilder extends SqlBuilder {
 		return new OperatorBuilder(this);
 	}
 
-	public OperatorBuilder in(String field, String paramName,
-			Map<String, Object> parameters, Object... values) {
+	public OperatorBuilder in(String field, String paramName, Object... values) {
 
 		if (field == null) {
 			throw new IllegalArgumentException("Field couldn't be null");
 		}
-		if (values == null || values.length == 0) {
+		
+		if (Arrays.asList(values).size() == 0  || Arrays.asList(values).contains(null)) {
 			expressionsList.add(null);
 			return new OperatorBuilder(this);
 		}
+		
 		StringBuffer sb = new StringBuffer();
 		sb.append(String.format(" %s IN( ", field));
 		int size = values.length - 1;
 		for (int i = 0; i < size; i++) {
-			sb.append(String.format(" :%s , ", paramName + i));
+			sb.append(String.format(" :%s, ", paramName + i));
 			parameters.put(paramName + i, values[i]);
 		}
 		sb.append(String.format(" :%s ) ", paramName));
@@ -94,7 +86,7 @@ public class ExpressionBuilder extends SqlBuilder {
 	}
 
 	public OperatorBuilder in(String field, String paramName,
-			Map<String, Object> parameters, List<Object> values) {
+			List<Object> values) {
 
 		if (field == null) {
 			throw new IllegalArgumentException("Field couldn't be null");
@@ -107,7 +99,7 @@ public class ExpressionBuilder extends SqlBuilder {
 		sb.append(String.format(" %s IN( ", field));
 		int size = values.size() - 1;
 		for (int i = 0; i < size; i++) {
-			sb.append(String.format(" :%s , ", paramName + i));
+			sb.append(String.format(" :%s, ", paramName + i));
 			parameters.put(paramName + i, values.get(i));
 		}
 		sb.append(String.format(" :%s ) ", paramName));
@@ -115,17 +107,5 @@ public class ExpressionBuilder extends SqlBuilder {
 		parameters.put(paramName + size, values.get(size));
 
 		return new OperatorBuilder(this);
-	}
-
-	public void addToList(Object o) {
-		expressionsList.add(o);
-	}
-
-	public boolean isExpressionCondition() {
-		return expressionCondition;
-	}
-
-	public ExpressionBuilder getExpressionBuilder() {
-		return expressionBuilder;
 	}
 }
