@@ -7,36 +7,44 @@ import java.util.List;
 import java.util.Map;
 
 import by.iba.sql.builder.SqlBuilder;
-import by.iba.sql.util.SqlConstatnt;
+import by.iba.sql.common.ExpressionFilter;
+import by.iba.sql.common.UserFiler;
 
 public class Application {
 	
-	public static void main(String[] args) {
+	private static UserFiler user = new UserFiler(1L, "Pablo", "Escobaro", 25L);
+	private static String select = "SELECT * FROM user WHERE ";
+	private static List<Object[]> ob = Arrays
+			.asList(new Object[][] {
+					{new ExpressionFilter(true, false),
+					"SELECT * FROM user WHERE (id > :id) AND surname LIKE '%'||:surname||'%'"},
+					{new ExpressionFilter(true, true),
+					"SELECT * FROM user WHERE ((age > :age AND name LIKE '%'||:name||'%') OR id > :id) AND surname LIKE '%'||:surname||'%'"},
+					{new ExpressionFilter(false, false),
+					"SELECT * FROM user WHERE surname LIKE '%'||:surname||'%'"},
+					{new ExpressionFilter(false, true),
+					"SELECT * FROM user WHERE surname LIKE '%'||:surname||'%'"},
+			});
+	
+	public static void main(String[] args) throws SQLSyntaxErrorException {
 		
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		
 		boolean filter1 = true;
-		boolean filter2 = true;
+		boolean filter2 = false;
 		
-		List<String> listIn = Arrays.asList("val1", "val2", "val3");		
+		
 		String sql;
 		try {
 			sql = new SqlBuilder(parameters)
 							.sql("SELECT * FROM USERS WHERE ")
-							.compare(SqlConstatnt.EQUALS, "password", "456", "asd")
-							.and()
-							.expression(filter1)
+//							
+							.like()
 								.expression(filter2)
-									.like("field", null, "loginparam")
-									.and()
-									.like("name", "qwe", "nameparam")
-								.end()
-								.or()
-								.like("surname", "123", "surnameParam")
+								.column("qwe")
+								.value("asd")
+								.name("zxc")
 							.end()
-							.or()
-							.in("login2", "lParam", "AAA", "QQQ")
-							.limit(3)
 							.build();
 			System.out.println(sql);
 		} catch (SQLSyntaxErrorException e) {

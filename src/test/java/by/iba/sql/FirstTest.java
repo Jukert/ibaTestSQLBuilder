@@ -25,37 +25,34 @@ public class FirstTest {
 		return Arrays
 				.asList(new Object[][] {
 						{ new UserFiler(null, null, null, null),
-								select + " 1 = 1 " },
+						select + "1 = 1" },
+						
 						{ new UserFiler(1L, null, null, null),
-								select + " id > :id " },
+						select + "id > :id" },
+						
 						{ new UserFiler(null, "Albert", null, null),
-								select + " name  LIKE '%'||:name||'%' " },
-						{
-								new UserFiler(null, null, "Svann", null),
-								select
-										+ " surname IN(  :surname0,  :surname ) " },
+						select + "name LIKE '%'||:name||'%'" },
+						
+						{new UserFiler(null, null, "Svann", null),
+						select + "surname IN(:surname0, :surname1)" },
+						
 						{ new UserFiler(null, null, null, 18L),
-								select + " age > :age " },
-						{
-								new UserFiler(null, "Albert", "Svann", null),
-								select
-										+ " name  LIKE '%'||:name||'%'  OR  surname IN(  :surname0,  :surname ) " },
-						{
-								new UserFiler(null, "Albert", null, 18L),
-								select
-										+ " name  LIKE '%'||:name||'%'  OR  age > :age " },
-						{
-								new UserFiler(null, "Albert", "Svann", 18L),
-								select
-										+ " name  LIKE '%'||:name||'%'  OR  surname IN(  :surname0,  :surname )  AND  age > :age " },
-						{
-								new UserFiler(1L, "Albert", "Svann", 18L),
-								select
-										+ " id > :id  AND  name  LIKE '%'||:name||'%'  OR  surname IN(  :surname0,  :surname )  AND  age > :age " },
-						{
-								new UserFiler(1L, null, "Svann", 18L),
-								select
-										+ " id > :id  AND  surname IN(  :surname0,  :surname )  AND  age > :age " }, });
+						select + "age > :age" },
+						
+						{new UserFiler(null, "Albert", "Svann", null),
+						select + "name LIKE '%'||:name||'%' OR surname IN(:surname0, :surname1)" },
+						
+						{new UserFiler(null, "Albert", null, 18L),
+						select + "name LIKE '%'||:name||'%' OR age > :age" },
+						
+						{new UserFiler(null, "Albert", "Svann", 18L),
+						select + "name LIKE '%'||:name||'%' OR surname IN(:surname0, :surname1) AND age > :age" },
+						
+						{new UserFiler(1L, "Albert", "Svann", 18L),
+						select + "id > :id AND name LIKE '%'||:name||'%' OR surname IN(:surname0, :surname1) AND age > :age" },
+						
+						{new UserFiler(1L, null, "Svann", 18L),
+						select + "id > :id AND surname IN(:surname0, :surname1) AND age > :age" }, });
 	}
 
 	@Parameter
@@ -70,15 +67,18 @@ public class FirstTest {
 
 		final String actual = new SqlBuilder(new HashMap<String, Object>())
 				.sql(select)
-				.compare(SqlConstatnt.MORE, "id", "id", filter.getId())
+					.compare(SqlConstatnt.MORE, "id", "id", filter.getId())
 				.and()
-				.like("name", "name", filter.getName())
+					.like()//"name", "name", user.getName()
+							.column("name")
+							.value(filter.getName())
+						.end()
 				.or()
-				.in("surname", "surname", filter.getSurname(),
-						filter.getSurname()).and()
-				.compare(SqlConstatnt.MORE, "age", "age", filter.getAge())
+					.in("surname", "surname", filter.getSurname(),
+						filter.getSurname())
+				.and()
+					.compare(SqlConstatnt.MORE, "age", "age", filter.getAge())
 				.build();
-		System.out.println(actual);
 		assertEquals(expected, actual);
 	}
 }

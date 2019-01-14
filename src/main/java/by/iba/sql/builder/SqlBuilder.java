@@ -10,23 +10,23 @@ import by.iba.sql.util.StringUtil;
 
 public class SqlBuilder {
 
-	private StringBuffer sql;
+	private StringBuilder sql;
 	protected static Map<String, Object> parameters;
 	protected List<Object> expressionsList;
 
-	public SqlBuilder(Map<String, Object> parameters) {
-		SqlBuilder.parameters = parameters;
-		sql = new StringBuffer();
+	SqlBuilder() {
+		sql = new StringBuilder();
 		expressionsList = new ArrayList<Object>();
 	}
-
-	 SqlBuilder() {
-		sql = new StringBuffer();
+	
+	public SqlBuilder(Map<String, Object> parameters) {
+		SqlBuilder.parameters = parameters;
+		sql = new StringBuilder();
 		expressionsList = new ArrayList<Object>();
 	}
 
 	public ExpressionBuilder sql(String sql) {
-		this.sql = new StringBuffer(sql);
+		this.sql = new StringBuilder(sql);
 		return new ExpressionBuilder(this);
 	}
 
@@ -55,7 +55,7 @@ public class SqlBuilder {
 
 		return this;
 	}
-
+	
 	public String build() throws SQLSyntaxErrorException {
 
 		for (int i = expressionsList.size() - 1; i > 0; i--) {
@@ -64,10 +64,9 @@ public class SqlBuilder {
 				continue;
 			}
 				
-			Object el = expressionsList.get(i) != null ? expressionsList.get(i)
-					: "";
-			if (!(el.equals(SqlConstatnt.AND.getValue()) || el
-					.equals(SqlConstatnt.OR.getValue()))) {
+			Object el = expressionsList.get(i) != null ? expressionsList.get(i) : "";
+			
+			if (!StringUtil.isEqualsOperators(el.toString())) {
 				continue;
 			}
 
@@ -75,6 +74,7 @@ public class SqlBuilder {
 				expressionsList.remove(i);
 				continue;
 			}
+			
 			boolean removeCondition = false;
 			if (StringUtil.isEmpty((String) expressionsList.get(i + 1))) {
 				expressionsList.remove(i + 1);
@@ -88,14 +88,14 @@ public class SqlBuilder {
 			}
 		}
 		
-		if (expressionsList.size() == 1 && expressionsList.get(0).toString().contains("WHERE")){
-			expressionsList.add(" 1 = 1 " );
+		if (expressionsList.size() == 1 && StringUtil.whereContains(expressionsList.get(0).toString())){
+			expressionsList.add("1 = 1" );
 		}
 
 		for (Object object : expressionsList) {
 			sql.append(object);
 		}
-
+		
 		return sql.toString();
 	}
 }
