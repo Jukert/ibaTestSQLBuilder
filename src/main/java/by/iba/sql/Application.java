@@ -1,30 +1,12 @@
 package by.iba.sql;
 
 import java.sql.SQLSyntaxErrorException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import by.iba.sql.builder.SqlBuilder;
-import by.iba.sql.common.ExpressionFilter;
-import by.iba.sql.common.UserFiler;
 
 public class Application {
-	
-	private static UserFiler user = new UserFiler(1L, "Pablo", "Escobaro", 25L);
-	private static String select = "SELECT * FROM user WHERE ";
-	private static List<Object[]> ob = Arrays
-			.asList(new Object[][] {
-					{new ExpressionFilter(true, false),
-					"SELECT * FROM user WHERE (id > :id) AND surname LIKE '%'||:surname||'%'"},
-					{new ExpressionFilter(true, true),
-					"SELECT * FROM user WHERE ((age > :age AND name LIKE '%'||:name||'%') OR id > :id) AND surname LIKE '%'||:surname||'%'"},
-					{new ExpressionFilter(false, false),
-					"SELECT * FROM user WHERE surname LIKE '%'||:surname||'%'"},
-					{new ExpressionFilter(false, true),
-					"SELECT * FROM user WHERE surname LIKE '%'||:surname||'%'"},
-			});
 	
 	public static void main(String[] args) throws SQLSyntaxErrorException {
 		
@@ -37,18 +19,30 @@ public class Application {
 		String sql;
 		try {
 			sql = new SqlBuilder(parameters)
-							.sql("SELECT * FROM USERS WHERE ")					
-							.like()
-								.expression(filter2)
-								.column("qwe")
-								.value("asd")
-								.name("zxc")
-							.end()
-							.and()
-							.compare()
-								.column("aaa")
-								.name("compare")
-								.value("asda")
+							.type("db2")
+							.sql("SELECT * FROM USERS WHERE ")
+							.expression(true)
+								.like()
+									.expression(filter2)
+									.column("qwe")
+									.value("asd")
+									.name("zxc")
+								.end()
+								.and()
+								.expression(true)
+									.compare()
+										.column("aaa")
+										.name("compare")
+										.value("asda")
+									.end()
+									.and()
+									.in()
+										.column("in")
+										.values("asd")
+										.values("qwe")
+										.name("testIN")
+									.end()
+								.end()
 							.end()
 							.and()
 							.in()
@@ -57,13 +51,19 @@ public class Application {
 								.values("qwe")
 								.name("testIN")
 							.end()
+							.and()
+							.between()
+								.column("Between")
+								.firstValue("first")
+								.secondValue("second")
+								.name("btw")
+							.end()
+							.limit(5)
 							.build();
 			System.out.println(sql);
 		} catch (SQLSyntaxErrorException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 		System.out.println(parameters.toString());
 	}
 }

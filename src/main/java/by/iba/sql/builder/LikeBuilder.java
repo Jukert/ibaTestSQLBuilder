@@ -1,6 +1,5 @@
 package by.iba.sql.builder;
 
-
 public class LikeBuilder {
 
 	private String column;
@@ -8,7 +7,7 @@ public class LikeBuilder {
 	private String name;
 	private boolean expression = true;
 	private ExpressionBuilder expressionBuilder;
-	
+
 	public LikeBuilder(ExpressionBuilder expressionBuilder) {
 		this.expressionBuilder = expressionBuilder;
 	}
@@ -17,27 +16,27 @@ public class LikeBuilder {
 		this.expression = expression;
 		return this;
 	}
-	
+
 	public LikeBuilder column(String column) {
 		this.column = column;
 		return this;
 	}
-	
+
 	public LikeBuilder value(Object value) {
 		this.value = value;
 		return this;
 	}
-	
-	public LikeBuilder name(String name){
+
+	public LikeBuilder name(String name) {
 		this.name = name;
 		return this;
 	}
-	
+
 	public OperatorBuilder end() {
-		
+
 		if (column == null)
 			throw new UnsupportedOperationException("Column couldn't be null!!");
-		
+
 		if (name == null) {
 			name = column;
 		}
@@ -45,11 +44,11 @@ public class LikeBuilder {
 		if (value == null || !expression) {
 			expressionBuilder.expressionsList.add(null);
 		} else {
-			expressionBuilder.expressionsList.add(column + " LIKE '%'||:" + name
-					+ "||'%'");
+			expressionBuilder.expressionsList.add(column + " LIKE '%'||:"
+					+ name + "||'%'");
 			ExpressionBuilder.parameters.put(name, value);
 		}
-		
+
 		return new OperatorBuilder(expressionBuilder);
 	}
 }

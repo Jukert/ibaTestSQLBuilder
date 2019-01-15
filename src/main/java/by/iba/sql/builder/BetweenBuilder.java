@@ -51,7 +51,7 @@ public class BetweenBuilder {
 			expressionBuilder.expressionsList.add(null);
 		} else {
 			expressionBuilder.expressionsList.add(String.format(
-					"%s BETWEEN %s0 AND %s1", column, name, name));
+					"%s BETWEEN :%s0 AND :%s1", column, name, name));
 			ExpressionBuilder.parameters.put(name + "0", fValue);
 			ExpressionBuilder.parameters.put(name + "1", fValue);
 		}

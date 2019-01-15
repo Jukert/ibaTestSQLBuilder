@@ -50,6 +50,7 @@ public class ExpressionTest {
 	public void validateNullObject() throws SQLSyntaxErrorException {
 
 		final String actual = new SqlBuilder(new HashMap<String, Object>())
+				.type("db2")
 				.sql("SELECT * FROM user WHERE ")
 				.expression(filter.isFirstExpression())
 					.expression(filter.isSecondExpression())

@@ -66,6 +66,7 @@ public class FirstTest {
 	public void validateNullObject() throws SQLSyntaxErrorException {
 
 		final String actual = new SqlBuilder(new HashMap<String, Object>())
+				.type("db2")
 				.sql(select)
 				.compare()
 					.column("id")

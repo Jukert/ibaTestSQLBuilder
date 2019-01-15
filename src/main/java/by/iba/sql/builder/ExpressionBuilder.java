@@ -6,22 +6,21 @@ public class ExpressionBuilder extends SqlBuilder {
 
 	private ExpressionBuilder expressionBuilder;
 	private boolean conditionExpression;
-	
-	
+
 	public ExpressionBuilder() {
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	public ExpressionBuilder(OperatorBuilder operatorBuilder) {
 		expressionsList = operatorBuilder.expressionsList;
 		if (operatorBuilder.getExpressionBuilder() != null)
 			expressionBuilder = operatorBuilder.getExpressionBuilder();
 	}
-	
+
 	public ExpressionBuilder(ExpressionBuilder expressionBuilder) {
 		this.expressionBuilder = expressionBuilder;
 	}
-	
+
 	public ExpressionBuilder(SqlBuilder sqlBuilder) {
 		if (!StringUtil.isEmpty(sqlBuilder.getSql())) {
 			expressionsList.add(sqlBuilder.getSql());
@@ -48,11 +47,11 @@ public class ExpressionBuilder extends SqlBuilder {
 	public BetweenBuilder between() {
 		return new BetweenBuilder(this);
 	}
-	
+
 	public ExpressionBuilder getExpressionBuilder() {
 		return expressionBuilder;
 	}
-	
+
 	public boolean isConditionExpression() {
 		return conditionExpression;
 	}

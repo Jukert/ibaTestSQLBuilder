@@ -46,14 +46,17 @@ public class OperatorBuilder extends SqlBuilder {
 	public OperatorBuilder end() {
 
 		if (expressionBuilder.isConditionExpression()) {
+			//add to start and end list '(' ')'
 			expressionsList.add(0, "(");
 			expressionsList.add(")");
+			//if true add to main expression
 			expressionBuilder.expressionsList.addAll(expressionsList);
+			expressionsList = expressionBuilder.expressionsList;
 		} else {
+			//if false remove expression part and save main expression
 			expressionsList = expressionBuilder.expressionsList;
 			expressionsList.add(null);
 		}
-		expressionsList = expressionBuilder.expressionsList;
 		expressionBuilder = expressionBuilder.getExpressionBuilder();
 		return this;
 	}

@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import by.iba.sql.database.DataBase;
 import by.iba.sql.util.SqlConstatnt;
 import by.iba.sql.util.StringUtil;
 
 public class SqlBuilder {
 
 	private StringBuilder sql;
+	protected static DataBase dataBase;
 	protected static Map<String, Object> parameters;
 	protected List<Object> expressionsList;
 
@@ -18,7 +20,7 @@ public class SqlBuilder {
 		sql = new StringBuilder();
 		expressionsList = new ArrayList<Object>();
 	}
-	
+
 	public SqlBuilder(Map<String, Object> parameters) {
 		SqlBuilder.parameters = parameters;
 		sql = new StringBuilder();
@@ -36,7 +38,7 @@ public class SqlBuilder {
 
 	public SqlBuilder limit(int limit) {
 
-		expressionsList.add(String.format(" FETCH FIRST %d ROWS ONLY ", limit));
+		expressionsList.add(String.format(dataBase.getLimit(), limit));
 
 		return this;
 	}
@@ -55,17 +57,28 @@ public class SqlBuilder {
 
 		return this;
 	}
+
+	public SqlBuilder type(Object database) {
+		SettingBuilder setting = new SettingBuilder();
+		if (database instanceof String){
+			setting.type((String) database);
+		}else {
+			setting.type((DataBase) database);
+		}
+		return this;
+	}
 	
 	public String build() throws SQLSyntaxErrorException {
 
 		for (int i = expressionsList.size() - 1; i > 0; i--) {
-			
-			if (i > expressionsList.size()-1){
+
+			if (i > expressionsList.size() - 1) {
 				continue;
 			}
-				
-			Object el = expressionsList.get(i) != null ? expressionsList.get(i) : "";
-			
+
+			Object el = expressionsList.get(i) != null ? expressionsList.get(i)
+					: "";
+
 			if (!StringUtil.isEqualsOperators(el.toString())) {
 				continue;
 			}
@@ -74,7 +87,7 @@ public class SqlBuilder {
 				expressionsList.remove(i);
 				continue;
 			}
-			
+
 			boolean removeCondition = false;
 			if (StringUtil.isEmpty((String) expressionsList.get(i + 1))) {
 				expressionsList.remove(i + 1);
@@ -87,15 +100,16 @@ public class SqlBuilder {
 				expressionsList.remove(i - 1);
 			}
 		}
-		
-		if (expressionsList.size() == 1 && StringUtil.whereContains(expressionsList.get(0).toString())){
-			expressionsList.add("1 = 1" );
+
+		if (expressionsList.size() == 1
+				&& StringUtil.whereContains(expressionsList.get(0).toString())) {
+			expressionsList.add("1 = 1");
 		}
 
 		for (Object object : expressionsList) {
 			sql.append(object);
 		}
-		
+
 		return sql.toString();
 	}
 }
