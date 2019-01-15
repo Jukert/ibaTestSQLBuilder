@@ -1,5 +1,7 @@
 package by.iba.sql.builder;
 
+import by.iba.sql.parts.child.ExpressionChild;
+
 public class BetweenBuilder {
 
 	private String column;
@@ -48,10 +50,11 @@ public class BetweenBuilder {
 		}
 
 		if (fValue == null || sValue == null || !expression) {
-			expressionBuilder.expressionsList.add(null);
+			SqlBuilder.sqlPart.getChild().add(new ExpressionChild(null));
 		} else {
-			expressionBuilder.expressionsList.add(String.format(
-					"%s BETWEEN :%s0 AND :%s1", column, name, name));
+			SqlBuilder.sqlPart.getChild().add(
+					new ExpressionChild(String.format(
+							"%s BETWEEN :%s0 AND :%s1", column, name, name)));
 			ExpressionBuilder.parameters.put(name + "0", fValue);
 			ExpressionBuilder.parameters.put(name + "1", fValue);
 		}

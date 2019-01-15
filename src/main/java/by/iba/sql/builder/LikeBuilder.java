@@ -1,5 +1,7 @@
 package by.iba.sql.builder;
 
+import by.iba.sql.parts.child.ExpressionChild;
+
 public class LikeBuilder {
 
 	private String column;
@@ -42,10 +44,11 @@ public class LikeBuilder {
 		}
 
 		if (value == null || !expression) {
-			expressionBuilder.expressionsList.add(null);
+			SqlBuilder.sqlPart.getChild().add(new ExpressionChild(null));
 		} else {
-			expressionBuilder.expressionsList.add(column + " LIKE '%'||:"
-					+ name + "||'%'");
+			SqlBuilder.sqlPart.getChild().add(
+					new ExpressionChild(column + " LIKE '%'||:" + name
+							+ "||'%'"));
 			ExpressionBuilder.parameters.put(name, value);
 		}
 

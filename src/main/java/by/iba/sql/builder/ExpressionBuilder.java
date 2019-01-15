@@ -12,7 +12,7 @@ public class ExpressionBuilder extends SqlBuilder {
 	}
 
 	public ExpressionBuilder(OperatorBuilder operatorBuilder) {
-		expressionsList = operatorBuilder.expressionsList;
+		sqlList = operatorBuilder.sqlList;
 		if (operatorBuilder.getExpressionBuilder() != null)
 			expressionBuilder = operatorBuilder.getExpressionBuilder();
 	}
@@ -23,7 +23,7 @@ public class ExpressionBuilder extends SqlBuilder {
 
 	public ExpressionBuilder(SqlBuilder sqlBuilder) {
 		if (!StringUtil.isEmpty(sqlBuilder.getSql())) {
-			expressionsList.add(sqlBuilder.getSql());
+			sqlList.add(sqlBuilder.getSql());
 		}
 	}
 

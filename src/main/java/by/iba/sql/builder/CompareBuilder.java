@@ -1,5 +1,6 @@
 package by.iba.sql.builder;
 
+import by.iba.sql.parts.child.ExpressionChild;
 import by.iba.sql.util.SqlConstatnt;
 
 public class CompareBuilder {
@@ -50,10 +51,12 @@ public class CompareBuilder {
 		}
 
 		if (value == null || !expression) {
-			expressionBuilder.expressionsList.add(null);
+			expressionBuilder.sqlList.add(null);
 		} else {
-			expressionBuilder.expressionsList.add(String.format("%s %s :%s",
-					column, operator.getValue(), name));
+			
+			SqlBuilder.sqlPart.getChild().add(new ExpressionChild(
+					String.format("%s %s :%s", column, operator.getValue(), name))
+			);
 			ExpressionBuilder.parameters.put(name, value);
 		}
 

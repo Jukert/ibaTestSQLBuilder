@@ -6,29 +6,34 @@ import java.util.List;
 import java.util.Map;
 
 import by.iba.sql.database.DataBase;
+import by.iba.sql.parts.SqlPart;
+import by.iba.sql.parts.child.ExpressionChild;
 import by.iba.sql.util.SqlConstatnt;
-import by.iba.sql.util.StringUtil;
 
 public class SqlBuilder {
 
 	private StringBuilder sql;
 	protected static DataBase dataBase;
 	protected static Map<String, Object> parameters;
-	protected List<Object> expressionsList;
+	protected static SqlPart sqlPart;
+	protected List<Object> sqlList;
+
+	// List<? extends SqlPart> parts
 
 	SqlBuilder() {
 		sql = new StringBuilder();
-		expressionsList = new ArrayList<Object>();
+		sqlList = new ArrayList<Object>();
 	}
 
 	public SqlBuilder(Map<String, Object> parameters) {
 		SqlBuilder.parameters = parameters;
 		sql = new StringBuilder();
-		expressionsList = new ArrayList<Object>();
+		sqlList = new ArrayList<Object>();
 	}
 
 	public ExpressionBuilder sql(String sql) {
 		this.sql = new StringBuilder(sql);
+		sqlPart = new SqlPart(sql);
 		return new ExpressionBuilder(this);
 	}
 
@@ -38,7 +43,8 @@ public class SqlBuilder {
 
 	public SqlBuilder limit(int limit) {
 
-		expressionsList.add(String.format(dataBase.getLimit(), limit));
+		sqlPart.getChild().add(
+				new ExpressionChild(String.format(dataBase.getLimit(), limit)));
 
 		return this;
 	}
@@ -49,67 +55,35 @@ public class SqlBuilder {
 			throw new IllegalArgumentException("Field couldn't be null");
 		}
 		int size = fields.length - 1;
-		expressionsList.add(" ORDER BY ");
+		StringBuilder sb = new StringBuilder(" ORDER BY ");
 		for (int i = 0; i < size; i++) {
-			expressionsList.add(String.format(" %s, ", fields[i]));
+			sb.append(String.format(" %s, ", fields[i]));
 		}
-		expressionsList.add(fields[size] + " " + operator.getValue());
-
+		sb.append(fields[size] + " " + operator.getValue());
+		sqlPart.getChild().add(new ExpressionChild(sb.toString()));
+		
 		return this;
 	}
 
 	public SqlBuilder type(Object database) {
-		SettingBuilder setting = new SettingBuilder();
-		if (database instanceof String){
+		SettingDB setting = new SettingDB();
+		if (database instanceof String) {
 			setting.type((String) database);
-		}else {
+		} else {
 			setting.type((DataBase) database);
 		}
 		return this;
 	}
-	
+
 	public String build() throws SQLSyntaxErrorException {
-
-		for (int i = expressionsList.size() - 1; i > 0; i--) {
-
-			if (i > expressionsList.size() - 1) {
-				continue;
-			}
-
-			Object el = expressionsList.get(i) != null ? expressionsList.get(i)
-					: "";
-
-			if (!StringUtil.isEqualsOperators(el.toString())) {
-				continue;
-			}
-
-			if (i == 0 || i == expressionsList.size() - 1) {
-				expressionsList.remove(i);
-				continue;
-			}
-
-			boolean removeCondition = false;
-			if (StringUtil.isEmpty((String) expressionsList.get(i + 1))) {
-				expressionsList.remove(i + 1);
-				expressionsList.remove(i);
-				removeCondition = true;
-			}
-			if (StringUtil.isEmpty((String) expressionsList.get(i - 1))) {
-				if (!removeCondition)
-					expressionsList.remove(i);
-				expressionsList.remove(i - 1);
+		
+		sql = new StringBuilder(sqlPart.getHeaderPart());
+		for (ExpressionChild e : sqlPart.getChild()) {
+			if (e.getExpression() != null) {
+				sql.append(e.getExpression()
+						+ (e.getOperator() != null ? e.getOperator() : ""));
 			}
 		}
-
-		if (expressionsList.size() == 1
-				&& StringUtil.whereContains(expressionsList.get(0).toString())) {
-			expressionsList.add("1 = 1");
-		}
-
-		for (Object object : expressionsList) {
-			sql.append(object);
-		}
-
 		return sql.toString();
 	}
 }

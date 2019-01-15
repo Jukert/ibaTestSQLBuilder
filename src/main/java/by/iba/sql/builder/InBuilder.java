@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import by.iba.sql.parts.child.ExpressionChild;
+
 public class InBuilder {
 
 	private String column;
@@ -57,7 +59,7 @@ public class InBuilder {
 		}
 
 		if (values.size() == 0 || values.contains(null) || !expression) {
-			expressionBuilder.expressionsList.add(null);
+			SqlBuilder.sqlPart.getChild().add(new ExpressionChild(null));
 		} else {
 			StringBuilder sb = new StringBuilder();
 			sb.append(column + " IN(");
@@ -67,7 +69,7 @@ public class InBuilder {
 				ExpressionBuilder.parameters.put(name + i, values.get(i));
 			}
 			sb.append(String.format(":%s%s)", name, size));
-			expressionBuilder.expressionsList.add(sb.toString());
+			SqlBuilder.sqlPart.getChild().add(new ExpressionChild(sb.toString()));
 			ExpressionBuilder.parameters.put(name + size, values.get(size));
 		}
 

@@ -4,7 +4,7 @@ import by.iba.sql.database.DataBase;
 import by.iba.sql.database.impl.DB2Base;
 import by.iba.sql.database.impl.MySQLBase;
 
-public class SettingBuilder {
+public class SettingDB {
 
 	private String mysql = "mysql";
 	private String db2 = "db2";

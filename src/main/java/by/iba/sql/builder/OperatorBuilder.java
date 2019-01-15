@@ -1,5 +1,6 @@
 package by.iba.sql.builder;
 
+import by.iba.sql.util.Lists;
 import by.iba.sql.util.OperatorConstant;
 import by.iba.sql.util.SqlConstatnt;
 
@@ -10,36 +11,36 @@ public class OperatorBuilder extends SqlBuilder {
 	public OperatorBuilder(ExpressionBuilder expressionBuilder) {
 		if (expressionBuilder.getExpressionBuilder() != null)
 			this.expressionBuilder = expressionBuilder.getExpressionBuilder();
-		expressionsList = expressionBuilder.expressionsList;
+		sqlList = expressionBuilder.sqlList;
 	}
 
 	public ExpressionBuilder and() {
-		expressionsList.add(OperatorConstant.AND);
+		Lists.getLast(sqlPart.getChild()).setOperator(OperatorConstant.AND);
 		return new ExpressionBuilder(this);
 	}
 
 	public ExpressionBuilder or() {
-		expressionsList.add(OperatorConstant.OR);
+		Lists.getLast(sqlPart.getChild()).setOperator(OperatorConstant.OR);
 		return new ExpressionBuilder(this);
 	}
 
 	public ExpressionBuilder all() {
-		expressionsList.add(OperatorConstant.ALL);
+		Lists.getLast(sqlPart.getChild()).setOperator(OperatorConstant.ALL);
 		return new ExpressionBuilder(this);
 	}
 
 	public ExpressionBuilder any() {
-		expressionsList.add(OperatorConstant.ANY);
+		Lists.getLast(sqlPart.getChild()).setOperator(OperatorConstant.ANY);
 		return new ExpressionBuilder(this);
 	}
 
 	public ExpressionBuilder some() {
-		expressionsList.add(OperatorConstant.SOME);
+		Lists.getLast(sqlPart.getChild()).setOperator(OperatorConstant.SOME);
 		return new ExpressionBuilder(this);
 	}
 
 	public ExpressionBuilder operator(SqlConstatnt operator) {
-		expressionsList.add(operator.getValue());
+		Lists.getLast(sqlPart.getChild()).setOperator(operator.getValue());
 		return new ExpressionBuilder(this);
 	}
 
@@ -47,15 +48,15 @@ public class OperatorBuilder extends SqlBuilder {
 
 		if (expressionBuilder.isConditionExpression()) {
 			//add to start and end list '(' ')'
-			expressionsList.add(0, "(");
-			expressionsList.add(")");
+			sqlList.add(0, "(");
+			sqlList.add(")");
 			//if true add to main expression
-			expressionBuilder.expressionsList.addAll(expressionsList);
-			expressionsList = expressionBuilder.expressionsList;
+			expressionBuilder.sqlList.addAll(sqlList);
+			sqlList = expressionBuilder.sqlList;
 		} else {
 			//if false remove expression part and save main expression
-			expressionsList = expressionBuilder.expressionsList;
-			expressionsList.add(null);
+			sqlList = expressionBuilder.sqlList;
+			sqlList.add(null);
 		}
 		expressionBuilder = expressionBuilder.getExpressionBuilder();
 		return this;
