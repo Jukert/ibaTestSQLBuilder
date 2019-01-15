@@ -31,19 +31,31 @@ public class Application {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		
 		boolean filter1 = true;
-		boolean filter2 = false;
+		boolean filter2 = true;
 		
 		
 		String sql;
 		try {
 			sql = new SqlBuilder(parameters)
-							.sql("SELECT * FROM USERS WHERE ")
-//							
+							.sql("SELECT * FROM USERS WHERE ")					
 							.like()
 								.expression(filter2)
 								.column("qwe")
 								.value("asd")
 								.name("zxc")
+							.end()
+							.and()
+							.compare()
+								.column("aaa")
+								.name("compare")
+								.value("asda")
+							.end()
+							.and()
+							.in()
+								.column("in")
+								.values("asd")
+								.values("qwe")
+								.name("testIN")
 							.end()
 							.build();
 			System.out.println(sql);
