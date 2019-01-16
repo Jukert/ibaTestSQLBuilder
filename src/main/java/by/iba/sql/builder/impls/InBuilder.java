@@ -1,21 +1,20 @@
-package by.iba.sql.builder;
+package by.iba.sql.builder.impls;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import by.iba.sql.builder.Builders;
 import by.iba.sql.parts.child.ExpressionChild;
 
-public class InBuilder {
+public class InBuilder implements Builders<InBuilder> {
 
 	private String column;
 	private List<Object> values;
 	private String name;
 	private boolean expression = true;
-	private ExpressionBuilder expressionBuilder;
 
-	public InBuilder(ExpressionBuilder expressionBuilder) {
-		this.expressionBuilder = expressionBuilder;
+	public InBuilder() {
 		values = new ArrayList<Object>();
 	}
 
@@ -39,7 +38,7 @@ public class InBuilder {
 		return this;
 	}
 
-	public InBuilder values(Object value) {
+	public InBuilder value(Object value) {
 		values.add(value);
 		return this;
 	}
@@ -59,7 +58,7 @@ public class InBuilder {
 		}
 
 		if (values.size() == 0 || values.contains(null) || !expression) {
-			SqlBuilder.sqlPart.getChild().add(new ExpressionChild(null));
+			SqlBuilder.sqlPart.getExpressionChilds().add(new ExpressionChild(null));
 		} else {
 			StringBuilder sb = new StringBuilder();
 			sb.append(column + " IN(");
@@ -69,11 +68,11 @@ public class InBuilder {
 				ExpressionBuilder.parameters.put(name + i, values.get(i));
 			}
 			sb.append(String.format(":%s%s)", name, size));
-			SqlBuilder.sqlPart.getChild().add(new ExpressionChild(sb.toString()));
+			SqlBuilder.sqlPart.getExpressionChilds().add(new ExpressionChild(sb.toString()));
 			ExpressionBuilder.parameters.put(name + size, values.get(size));
 		}
 
-		return new OperatorBuilder(expressionBuilder);
+		return new OperatorBuilder();
 	}
 
 }

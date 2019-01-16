@@ -13,7 +13,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-import by.iba.sql.builder.SqlBuilder;
+import by.iba.sql.builder.impls.SqlBuilder;
 import by.iba.sql.common.UserFiler;
 import by.iba.sql.util.SqlConstatnt;
 
@@ -25,7 +25,7 @@ public class FirstTest {
 		return Arrays
 				.asList(new Object[][] {
 						{ new UserFiler(null, null, null, null),
-						select + "1 = 1" },
+						select + "" },
 						
 						{ new UserFiler(1L, null, null, null),
 						select + "id > :id" },

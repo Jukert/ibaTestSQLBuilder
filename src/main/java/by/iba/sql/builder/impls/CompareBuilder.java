@@ -1,20 +1,16 @@
-package by.iba.sql.builder;
+package by.iba.sql.builder.impls;
 
+import by.iba.sql.builder.Builders;
 import by.iba.sql.parts.child.ExpressionChild;
 import by.iba.sql.util.SqlConstatnt;
 
-public class CompareBuilder {
+public class CompareBuilder implements Builders<CompareBuilder>{
 
 	private String column;
 	private Object value;
 	private String name;
 	private boolean expression = true;
 	private SqlConstatnt operator = SqlConstatnt.EQUALS;
-	private ExpressionBuilder expressionBuilder;
-
-	public CompareBuilder(ExpressionBuilder expressionBuilder) {
-		this.expressionBuilder = expressionBuilder;
-	}
 
 	public CompareBuilder expression(boolean expression) {
 		this.expression = expression;
@@ -51,15 +47,15 @@ public class CompareBuilder {
 		}
 
 		if (value == null || !expression) {
-			expressionBuilder.sqlList.add(null);
+			SqlBuilder.sqlPart.getExpressionChilds().add(new ExpressionChild(null));
 		} else {
 			
-			SqlBuilder.sqlPart.getChild().add(new ExpressionChild(
+			SqlBuilder.sqlPart.getExpressionChilds().add(new ExpressionChild(
 					String.format("%s %s :%s", column, operator.getValue(), name))
 			);
 			ExpressionBuilder.parameters.put(name, value);
 		}
 
-		return new OperatorBuilder(expressionBuilder);
+		return new OperatorBuilder();
 	}
 }

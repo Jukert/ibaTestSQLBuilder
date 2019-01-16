@@ -13,7 +13,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-import by.iba.sql.builder.SqlBuilder;
+import by.iba.sql.builder.impls.SqlBuilder;
 import by.iba.sql.common.ExpressionFilter;
 import by.iba.sql.common.UserFiler;
 import by.iba.sql.util.SqlConstatnt;

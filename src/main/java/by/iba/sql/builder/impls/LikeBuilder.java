@@ -1,19 +1,15 @@
-package by.iba.sql.builder;
+package by.iba.sql.builder.impls;
 
+import by.iba.sql.builder.Builders;
 import by.iba.sql.parts.child.ExpressionChild;
 
-public class LikeBuilder {
+public class LikeBuilder implements Builders<LikeBuilder> {
 
 	private String column;
 	private Object value;
 	private String name;
 	private boolean expression = true;
-	private ExpressionBuilder expressionBuilder;
-
-	public LikeBuilder(ExpressionBuilder expressionBuilder) {
-		this.expressionBuilder = expressionBuilder;
-	}
-
+	
 	public LikeBuilder expression(boolean expression) {
 		this.expression = expression;
 		return this;
@@ -44,14 +40,14 @@ public class LikeBuilder {
 		}
 
 		if (value == null || !expression) {
-			SqlBuilder.sqlPart.getChild().add(new ExpressionChild(null));
+			SqlBuilder.sqlPart.getExpressionChilds().add(new ExpressionChild(null));
 		} else {
-			SqlBuilder.sqlPart.getChild().add(
+			SqlBuilder.sqlPart.getExpressionChilds().add(
 					new ExpressionChild(column + " LIKE '%'||:" + name
 							+ "||'%'"));
 			ExpressionBuilder.parameters.put(name, value);
 		}
 
-		return new OperatorBuilder(expressionBuilder);
+		return new OperatorBuilder();
 	}
 }

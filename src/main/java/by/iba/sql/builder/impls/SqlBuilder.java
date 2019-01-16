@@ -1,13 +1,14 @@
-package by.iba.sql.builder;
+package by.iba.sql.builder.impls;
 
 import java.sql.SQLSyntaxErrorException;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import by.iba.sql.database.DataBase;
 import by.iba.sql.parts.SqlPart;
 import by.iba.sql.parts.child.ExpressionChild;
+import by.iba.sql.util.Lists;
 import by.iba.sql.util.SqlConstatnt;
 
 public class SqlBuilder {
@@ -16,25 +17,22 @@ public class SqlBuilder {
 	protected static DataBase dataBase;
 	protected static Map<String, Object> parameters;
 	protected static SqlPart sqlPart;
-	protected List<Object> sqlList;
 
 	// List<? extends SqlPart> parts
 
 	SqlBuilder() {
 		sql = new StringBuilder();
-		sqlList = new ArrayList<Object>();
 	}
 
 	public SqlBuilder(Map<String, Object> parameters) {
 		SqlBuilder.parameters = parameters;
 		sql = new StringBuilder();
-		sqlList = new ArrayList<Object>();
 	}
 
 	public ExpressionBuilder sql(String sql) {
 		this.sql = new StringBuilder(sql);
 		sqlPart = new SqlPart(sql);
-		return new ExpressionBuilder(this);
+		return new ExpressionBuilder();
 	}
 
 	public String getSql() {
@@ -43,8 +41,9 @@ public class SqlBuilder {
 
 	public SqlBuilder limit(int limit) {
 
-		sqlPart.getChild().add(
-				new ExpressionChild(String.format(dataBase.getLimit(), limit)));
+		sqlPart.getAdditionalPart().setLimit(
+				String.format(dataBase.getLimit(), limit));
+		;
 
 		return this;
 	}
@@ -60,8 +59,9 @@ public class SqlBuilder {
 			sb.append(String.format(" %s, ", fields[i]));
 		}
 		sb.append(fields[size] + " " + operator.getValue());
-		sqlPart.getChild().add(new ExpressionChild(sb.toString()));
-		
+		sqlPart.getAdditionalPart().setOrder(sb.toString());
+		;
+
 		return this;
 	}
 
@@ -76,14 +76,41 @@ public class SqlBuilder {
 	}
 
 	public String build() throws SQLSyntaxErrorException {
+
+		String header = sqlPart.getHeaderPart();
+		String limit = sqlPart.getAdditionalPart().getLimit();
+		String order = sqlPart.getAdditionalPart().getOrder();
+		String additional = (limit != null ? limit : "")
+				+ (order != null ? order : "");
+
+		StringBuilder sb = new StringBuilder(header != null ? header : "");
 		
-		sql = new StringBuilder(sqlPart.getHeaderPart());
-		for (ExpressionChild e : sqlPart.getChild()) {
-			if (e.getExpression() != null) {
-				sql.append(e.getExpression()
-						+ (e.getOperator() != null ? e.getOperator() : ""));
+		List<ExpressionChild> list = SqlBuilder.valid(sqlPart
+				.getExpressionChilds());
+
+		for (ExpressionChild ex : list) {
+			sb.append(ex.getExpression()
+					+ (ex.getOperator() != null ? ex.getOperator() : ""));
+		}
+
+		sb.append(additional);
+		return sb.toString();
+	}
+
+	public static List<ExpressionChild> valid(List<ExpressionChild> expressionChilds) {
+
+		Iterator<ExpressionChild> itr = expressionChilds.iterator();
+		
+		while(itr.hasNext()) {
+			ExpressionChild ex = itr.next();
+			if (ex.getExpression() == null) {
+				itr.remove();
 			}
 		}
-		return sql.toString();
+		
+		if (expressionChilds.size() > 0)
+			Lists.getLast(expressionChilds).setOperator(null);
+
+		return expressionChilds;
 	}
 }

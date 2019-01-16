@@ -1,19 +1,15 @@
-package by.iba.sql.builder;
+package by.iba.sql.builder.impls;
 
+import by.iba.sql.builder.Builders;
 import by.iba.sql.parts.child.ExpressionChild;
 
-public class BetweenBuilder {
+public class BetweenBuilder implements Builders<BetweenBuilder> {
 
 	private String column;
 	private Object fValue;
 	private Object sValue;
 	private String name;
 	private boolean expression = true;
-	private ExpressionBuilder expressionBuilder;
-
-	public BetweenBuilder(ExpressionBuilder expressionBuilder) {
-		this.expressionBuilder = expressionBuilder;
-	}
 
 	public BetweenBuilder expression(boolean expression) {
 		this.expression = expression;
@@ -50,15 +46,19 @@ public class BetweenBuilder {
 		}
 
 		if (fValue == null || sValue == null || !expression) {
-			SqlBuilder.sqlPart.getChild().add(new ExpressionChild(null));
+			SqlBuilder.sqlPart.getExpressionChilds().add(new ExpressionChild(null));
 		} else {
-			SqlBuilder.sqlPart.getChild().add(
+			SqlBuilder.sqlPart.getExpressionChilds().add(
 					new ExpressionChild(String.format(
 							"%s BETWEEN :%s0 AND :%s1", column, name, name)));
 			ExpressionBuilder.parameters.put(name + "0", fValue);
 			ExpressionBuilder.parameters.put(name + "1", fValue);
 		}
 
-		return new OperatorBuilder(expressionBuilder);
+		return new OperatorBuilder();
+	}
+
+	public BetweenBuilder value(Object value) {
+		throw new UnsupportedOperationException("In this method use fValue() and sValue()");
 	}
 }

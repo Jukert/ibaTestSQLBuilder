@@ -1,4 +1,4 @@
-package by.iba.sql.builder;
+package by.iba.sql.builder.impls;
 
 import by.iba.sql.database.DataBase;
 import by.iba.sql.database.impl.DB2Base;
