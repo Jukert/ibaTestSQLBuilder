@@ -4,18 +4,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import by.iba.sql.builder.Builders;
+import by.iba.sql.builder.Builder;
+import by.iba.sql.parts.SqlPart;
 import by.iba.sql.parts.child.ExpressionChild;
 
-public class InBuilder implements Builders<InBuilder> {
+public class InBuilder implements Builder<InBuilder> {
 
 	private String column;
 	private List<Object> values;
 	private String name;
 	private boolean expression = true;
+	private String sql;
+	private SqlPart sqlPart;
 
-	public InBuilder() {
+	public InBuilder(SqlPart sqlPart) {
 		values = new ArrayList<Object>();
+		this.sqlPart = sqlPart;
 	}
 
 	public InBuilder expression(boolean expression) {
@@ -47,8 +51,13 @@ public class InBuilder implements Builders<InBuilder> {
 		this.name = name;
 		return this;
 	}
+	
+	public InBuilder sql(String sql) {
+		this.sql = sql;
+		return this;
+	}
 
-	public OperatorBuilder end() {
+	public SqlBuilder end() {
 
 		if (column == null)
 			throw new UnsupportedOperationException("Column couldn't be null!!");
@@ -57,8 +66,16 @@ public class InBuilder implements Builders<InBuilder> {
 			name = column;
 		}
 
-		if (values.size() == 0 || values.contains(null) || !expression) {
-			SqlBuilder.sqlPart.getExpressionChilds().add(new ExpressionChild(null));
+		if (sql != null) {
+			sqlPart.getExpressionChilds().add(new ExpressionChild(
+					column + " IN(" + sql + ")"
+					));
+			return new SqlBuilder(sqlPart);
+		}
+		
+		if ((values.size() == 0 || values.contains(null) || !expression) && sql == null) {
+			sqlPart.getExpressionChilds().add(
+					new ExpressionChild(null));
 		} else {
 			StringBuilder sb = new StringBuilder();
 			sb.append(column + " IN(");
@@ -68,11 +85,12 @@ public class InBuilder implements Builders<InBuilder> {
 				ExpressionBuilder.parameters.put(name + i, values.get(i));
 			}
 			sb.append(String.format(":%s%s)", name, size));
-			SqlBuilder.sqlPart.getExpressionChilds().add(new ExpressionChild(sb.toString()));
+			sqlPart.getExpressionChilds().add(
+					new ExpressionChild(sb.toString()));
 			ExpressionBuilder.parameters.put(name + size, values.get(size));
 		}
 
-		return new OperatorBuilder();
+		return new SqlBuilder(sqlPart);
 	}
 
 }

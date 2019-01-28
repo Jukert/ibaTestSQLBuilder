@@ -1,14 +1,20 @@
 package by.iba.sql.builder.impls;
 
-import by.iba.sql.builder.Builders;
+import by.iba.sql.builder.Builder;
+import by.iba.sql.parts.SqlPart;
 import by.iba.sql.parts.child.ExpressionChild;
 
-public class LikeBuilder implements Builders<LikeBuilder> {
+public class LikeBuilder implements Builder<LikeBuilder> {
 
 	private String column;
 	private Object value;
 	private String name;
 	private boolean expression = true;
+	private SqlPart sqlPart;
+	
+	public LikeBuilder(SqlPart sqlPart) {
+		this.sqlPart = sqlPart;
+	}
 	
 	public LikeBuilder expression(boolean expression) {
 		this.expression = expression;
@@ -30,7 +36,7 @@ public class LikeBuilder implements Builders<LikeBuilder> {
 		return this;
 	}
 
-	public OperatorBuilder end() {
+	public SqlBuilder end() {
 
 		if (column == null)
 			throw new UnsupportedOperationException("Column couldn't be null!!");
@@ -40,14 +46,14 @@ public class LikeBuilder implements Builders<LikeBuilder> {
 		}
 
 		if (value == null || !expression) {
-			SqlBuilder.sqlPart.getExpressionChilds().add(new ExpressionChild(null));
+			sqlPart.getExpressionChilds().add(
+					new ExpressionChild(null));
 		} else {
-			SqlBuilder.sqlPart.getExpressionChilds().add(
-					new ExpressionChild(column + " LIKE '%'||:" + name
-							+ "||'%'"));
+			sqlPart.getExpressionChilds().add(
+					new ExpressionChild(String.format(SqlBuilder.dataBase.getLike(), column, name)));
 			ExpressionBuilder.parameters.put(name, value);
 		}
 
-		return new OperatorBuilder();
+		return new SqlBuilder(sqlPart);
 	}
 }

@@ -20,9 +20,9 @@ public class SettingDB {
 					"There isn't supported this base!!!");
 		}
 	}
-	
+
 	public void type(DataBase dataBase) {
-		if(dataBase != null){
+		if (dataBase != null) {
 			SqlBuilder.dataBase = dataBase;
 			return;
 		}

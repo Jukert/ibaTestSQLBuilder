@@ -9,6 +9,7 @@ import by.iba.sql.database.DataBase;
 import by.iba.sql.parts.SqlPart;
 import by.iba.sql.parts.child.ExpressionChild;
 import by.iba.sql.util.Lists;
+import by.iba.sql.util.OperatorConstant;
 import by.iba.sql.util.SqlConstatnt;
 
 public class SqlBuilder {
@@ -16,12 +17,16 @@ public class SqlBuilder {
 	private StringBuilder sql;
 	protected static DataBase dataBase;
 	protected static Map<String, Object> parameters;
-	protected static SqlPart sqlPart;
+	protected SqlPart sqlPart;
 
 	// List<? extends SqlPart> parts
 
 	SqlBuilder() {
 		sql = new StringBuilder();
+	}
+	
+	public SqlBuilder(SqlPart sqlPart) {
+		this.sqlPart = sqlPart;
 	}
 
 	public SqlBuilder(Map<String, Object> parameters) {
@@ -30,9 +35,17 @@ public class SqlBuilder {
 	}
 
 	public ExpressionBuilder sql(String sql) {
-		this.sql = new StringBuilder(sql);
-		sqlPart = new SqlPart(sql);
-		return new ExpressionBuilder();
+		if (sqlPart == null) {
+			this.sql = new StringBuilder(sql);
+			sqlPart = new SqlPart(sql);
+		} else {
+			sqlPart.getExpressionChilds().add(new ExpressionChild(sql));
+		}
+		return new ExpressionBuilder(sqlPart);
+	}
+
+	public ManualBuilder sql() {
+		return new ManualBuilder(sqlPart);
 	}
 
 	public String getSql() {
@@ -84,7 +97,7 @@ public class SqlBuilder {
 				+ (order != null ? order : "");
 
 		StringBuilder sb = new StringBuilder(header != null ? header : "");
-		
+
 		List<ExpressionChild> list = SqlBuilder.valid(sqlPart
 				.getExpressionChilds());
 
@@ -92,22 +105,91 @@ public class SqlBuilder {
 			sb.append(ex.getExpression()
 					+ (ex.getOperator() != null ? ex.getOperator() : ""));
 		}
-
+		if (list == null || list.size() == 0) {
+			return null;
+		}
 		sb.append(additional);
 		return sb.toString();
 	}
+	
 
+	public ExpressionBuilder and() {
+		Lists.getLast(sqlPart.getExpressionChilds()).setOperator(
+				OperatorConstant.AND);
+		return new ExpressionBuilder(sqlPart);
+	}
+
+	public ExpressionBuilder or() {
+		Lists.getLast(sqlPart.getExpressionChilds()).setOperator(
+				OperatorConstant.OR);
+		return new ExpressionBuilder(sqlPart);
+	}
+
+	public ExpressionBuilder all() {
+		Lists.getLast(sqlPart.getExpressionChilds()).setOperator(
+				OperatorConstant.ALL);
+		return new ExpressionBuilder(sqlPart);
+	}
+
+	public ExpressionBuilder any() {
+		Lists.getLast(sqlPart.getExpressionChilds()).setOperator(
+				OperatorConstant.ANY);
+		return new ExpressionBuilder(sqlPart);
+	}
+
+	public ExpressionBuilder some() {
+		Lists.getLast(sqlPart.getExpressionChilds()).setOperator(
+				OperatorConstant.SOME);
+		return new ExpressionBuilder(sqlPart);
+	}
+
+	public ExpressionBuilder operator(SqlConstatnt operator) {
+		Lists.getLast(sqlPart.getExpressionChilds()).setOperator(
+				operator.getValue());
+		return new ExpressionBuilder(sqlPart);
+	}
+
+	// end expression()
+		public SqlBuilder end() {
+			SqlPart child = sqlPart.getSqlPart();
+			sqlPart.setExpressionChilds(SqlBuilder.valid(sqlPart
+					.getExpressionChilds()));
+			// if expression(true)
+			if (child.isConditionExpression()) {
+				// do (list)
+				sqlPart.getExpressionChilds().add(0, new ExpressionChild("("));
+				sqlPart.getExpressionChilds().add(new ExpressionChild(")"));
+				sqlPart.getExpressionChilds()
+						.addAll(0, child.getExpressionChilds());
+			}
+			// if expression(false)
+			else {
+				// rewrite
+				sqlPart.setExpressionChilds(child.getExpressionChilds());
+				sqlPart.getExpressionChilds().add(new ExpressionChild(null));
+			}
+			// if not exist another part, save header and additional part
+			// but if not null that rewrite
+			if (child.getSqlPart() != null) {
+				sqlPart.setSqlPart(child.getSqlPart());
+			} else {
+				sqlPart.setAdditionalPart(child.getAdditionalPart());
+				sqlPart.setHeaderPart(child.getHeaderPart());
+			}
+			return this;
+		}
+	
 	public static List<ExpressionChild> valid(List<ExpressionChild> expressionChilds) {
 
 		Iterator<ExpressionChild> itr = expressionChilds.iterator();
-		
-		while(itr.hasNext()) {
+
+		while (itr.hasNext()) {
 			ExpressionChild ex = itr.next();
 			if (ex.getExpression() == null) {
 				itr.remove();
 			}
 		}
-		
+
 		if (expressionChilds.size() > 0)
 			Lists.getLast(expressionChilds).setOperator(null);
 

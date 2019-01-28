@@ -1,16 +1,22 @@
 package by.iba.sql.builder.impls;
 
-import by.iba.sql.builder.Builders;
+import by.iba.sql.builder.Builder;
+import by.iba.sql.parts.SqlPart;
 import by.iba.sql.parts.child.ExpressionChild;
 
-public class BetweenBuilder implements Builders<BetweenBuilder> {
+public class BetweenBuilder implements Builder<BetweenBuilder> {
 
 	private String column;
 	private Object fValue;
 	private Object sValue;
 	private String name;
 	private boolean expression = true;
-
+	private SqlPart sqlPart;
+	
+	public BetweenBuilder(SqlPart sqlPart) {
+		this.sqlPart = sqlPart;
+	}
+	
 	public BetweenBuilder expression(boolean expression) {
 		this.expression = expression;
 		return this;
@@ -36,7 +42,7 @@ public class BetweenBuilder implements Builders<BetweenBuilder> {
 		return this;
 	}
 
-	public OperatorBuilder end() {
+	public SqlBuilder end() {
 
 		if (column == null)
 			throw new UnsupportedOperationException("Column couldn't be null!!");
@@ -46,19 +52,21 @@ public class BetweenBuilder implements Builders<BetweenBuilder> {
 		}
 
 		if (fValue == null || sValue == null || !expression) {
-			SqlBuilder.sqlPart.getExpressionChilds().add(new ExpressionChild(null));
+			sqlPart.getExpressionChilds().add(
+					new ExpressionChild(null));
 		} else {
-			SqlBuilder.sqlPart.getExpressionChilds().add(
+			sqlPart.getExpressionChilds().add(
 					new ExpressionChild(String.format(
 							"%s BETWEEN :%s0 AND :%s1", column, name, name)));
 			ExpressionBuilder.parameters.put(name + "0", fValue);
 			ExpressionBuilder.parameters.put(name + "1", fValue);
 		}
 
-		return new OperatorBuilder();
+		return new SqlBuilder(sqlPart);
 	}
 
 	public BetweenBuilder value(Object value) {
-		throw new UnsupportedOperationException("In this method use fValue() and sValue()");
+		throw new UnsupportedOperationException(
+				"In this method use fValue() and sValue()");
 	}
 }

@@ -25,7 +25,7 @@ public class FirstTest {
 		return Arrays
 				.asList(new Object[][] {
 						{ new UserFiler(null, null, null, null),
-						select + "" },
+						null },
 						
 						{ new UserFiler(1L, null, null, null),
 						select + "id > :id" },
@@ -65,7 +65,7 @@ public class FirstTest {
 	@Test
 	public void validateNullObject() throws SQLSyntaxErrorException {
 
-		final String actual = new SqlBuilder(new HashMap<String, Object>())
+		String actual = new SqlBuilder(new HashMap<String, Object>())
 				.type("db2")
 				.sql(select)
 				.compare()

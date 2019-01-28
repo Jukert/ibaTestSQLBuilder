@@ -1,6 +1,5 @@
 package by.iba.sql.parts.child;
 
-
 public class ExpressionChild {
 
 	private String expression;
@@ -13,7 +12,7 @@ public class ExpressionChild {
 	public ExpressionChild(String expression) {
 		this.expression = expression;
 	}
-	
+
 	public String getExpression() {
 		return expression;
 	}

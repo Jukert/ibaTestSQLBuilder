@@ -2,35 +2,36 @@ package by.iba.sql.builder.impls;
 
 import by.iba.sql.parts.SqlPart;
 
-
 public class ExpressionBuilder extends SqlBuilder {
 
-	public ExpressionBuilder() {
-		// TODO Auto-generated constructor stub
-	}
+	private SqlPart sqlPart;
 	
+	public ExpressionBuilder(SqlPart sqlPart) {
+		this.sqlPart = sqlPart;
+	}
+
 	public ExpressionBuilder expression(boolean condition) {
-		
-		SqlPart parent = SqlBuilder.sqlPart;
+
+		SqlPart parent = sqlPart;
 		parent.setConditionExpression(condition);
-		parent.setSqlPart(new SqlPart(SqlBuilder.sqlPart));
+		parent.setSqlPart(new SqlPart(sqlPart));
 		parent.empty();
-		return new ExpressionBuilder();
+		return new ExpressionBuilder(sqlPart);
 	}
 
 	public LikeBuilder like() {
-		return new LikeBuilder();
+		return new LikeBuilder(sqlPart);
 	}
 
 	public CompareBuilder compare() {
-		return new CompareBuilder();
+		return new CompareBuilder(sqlPart);
 	}
 
 	public InBuilder in() {
-		return new InBuilder();
+		return new InBuilder(sqlPart);
 	}
 
 	public BetweenBuilder between() {
-		return new BetweenBuilder();
+		return new BetweenBuilder(sqlPart);
 	}
 }

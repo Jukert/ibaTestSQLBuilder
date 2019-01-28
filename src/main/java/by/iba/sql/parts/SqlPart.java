@@ -68,7 +68,7 @@ public class SqlPart {
 	public void setConditionExpression(boolean conditionExpression) {
 		this.conditionExpression = conditionExpression;
 	}
-	
+
 	public void empty() {
 		headerPart = null;
 		expressionChilds = new ArrayList<ExpressionChild>();

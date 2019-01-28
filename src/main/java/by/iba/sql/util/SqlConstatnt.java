@@ -11,7 +11,7 @@ public class SqlConstatnt {
 	public final static SqlConstatnt LESS_EQUALS = new SqlConstatnt("<=");
 
 	public final static SqlConstatnt EQUALS = new SqlConstatnt("=");
-	
+
 	public final static SqlConstatnt NOT_EQUALS = new SqlConstatnt("<>");
 
 	public final static SqlConstatnt ASC = new SqlConstatnt(" ASC ");

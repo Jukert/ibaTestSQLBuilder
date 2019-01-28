@@ -4,7 +4,7 @@ public class AdditionalPart {
 
 	private String limit;
 	private String order;
-	
+
 	public AdditionalPart() {
 		// TODO Auto-generated constructor stub
 	}
