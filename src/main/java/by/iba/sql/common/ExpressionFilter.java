@@ -17,7 +17,7 @@ public class ExpressionFilter {
 
 	public boolean isFirstExpression() {
 		return firstExpression;
-	}
+	} 
 
 	public void setFirstExpression(boolean firstExpression) {
 		this.firstExpression = firstExpression;
