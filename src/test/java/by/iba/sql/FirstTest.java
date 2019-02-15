@@ -15,6 +15,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import by.iba.sql.builder.impls.SqlBuilder;
 import by.iba.sql.common.UserFiler;
+import by.iba.sql.database.impl.DB2Base;
 import by.iba.sql.util.SqlConstatnt;
 
 @RunWith(Parameterized.class)
@@ -65,8 +66,7 @@ public class FirstTest {
 	@Test
 	public void validateNullObject() throws SQLSyntaxErrorException {
 
-		String actual = new SqlBuilder(new HashMap<String, Object>())
-				.type("db2")
+		String actual = new SqlBuilder(new HashMap<String, Object>(), new DB2Base())
 				.sql(select)
 				.compare()
 					.column("id")

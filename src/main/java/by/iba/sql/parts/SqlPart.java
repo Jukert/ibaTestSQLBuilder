@@ -3,6 +3,7 @@ package by.iba.sql.parts;
 import java.util.ArrayList;
 import java.util.List;
 
+import by.iba.sql.page.Pageable;
 import by.iba.sql.parts.child.ExpressionChild;
 
 public class SqlPart {
@@ -11,6 +12,7 @@ public class SqlPart {
 	private List<ExpressionChild> expressionChilds;
 	private AdditionalPart additionalPart;
 	private SqlPart sqlPart;
+	private Pageable pageable;
 	private boolean conditionExpression = true;
 
 	public SqlPart(String headerPart) {
@@ -67,6 +69,14 @@ public class SqlPart {
 
 	public void setConditionExpression(boolean conditionExpression) {
 		this.conditionExpression = conditionExpression;
+	}
+
+	public Pageable getPageable() {
+		return pageable;
+	}
+
+	public void setPageable(Pageable pageable) {
+		this.pageable = pageable;
 	}
 
 	public void empty() {

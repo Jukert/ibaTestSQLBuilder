@@ -1,8 +1,11 @@
 package by.iba.sql.database;
 
+import by.iba.sql.parts.AdditionalPart;
+
+
 public interface DataBase {
 
-	String getLimit();
+	AdditionalPart getLimit();
 	
 	String getLike();
 

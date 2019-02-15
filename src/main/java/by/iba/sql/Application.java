@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import by.iba.sql.builder.impls.SqlBuilder;
+import by.iba.sql.database.impl.MySQLBase;
 
 public class Application {
 	
@@ -13,7 +14,7 @@ public class Application {
 		boolean filter2 = true;
 		String sql;
 		try {
-			sql = new SqlBuilder(parameters)
+			sql = new SqlBuilder(parameters, new MySQLBase())
 							.type("db2")
 							.sql("SELECT * FROM USERS WHERE ")
 							.like()
@@ -56,7 +57,6 @@ public class Application {
 
 								.name("btw")
 							.end()
-							.limit(5)
 							.build();
 			System.out.println(sql);
 		} catch (SQLSyntaxErrorException e) {

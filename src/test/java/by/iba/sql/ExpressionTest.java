@@ -16,6 +16,7 @@ import org.junit.runners.Parameterized.Parameters;
 import by.iba.sql.builder.impls.SqlBuilder;
 import by.iba.sql.common.ExpressionFilter;
 import by.iba.sql.common.UserFiler;
+import by.iba.sql.database.impl.DB2Base;
 import by.iba.sql.util.SqlConstatnt;
 
 @RunWith(Parameterized.class)
@@ -49,8 +50,7 @@ public class ExpressionTest {
 	@Test
 	public void validateNullObject() throws SQLSyntaxErrorException {
 
-		final String actual = new SqlBuilder(new HashMap<String, Object>())
-				.type("db2")
+		final String actual = new SqlBuilder(new HashMap<String, Object>(), new DB2Base())
 				.sql("SELECT * FROM user WHERE ")
 				.expression(filter.isFirstExpression())
 					.expression(filter.isSecondExpression())

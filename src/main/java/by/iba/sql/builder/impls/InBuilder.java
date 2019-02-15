@@ -32,8 +32,10 @@ public class InBuilder implements Builder<InBuilder> {
 		return this;
 	}
 
-	public InBuilder values(List<Object> values) {
-		this.values.addAll(values);
+	public InBuilder values(List<String> values) {
+		if (values != null) {
+			this.values.addAll(values);
+		}
 		return this;
 	}
 

@@ -1,6 +1,7 @@
 package by.iba.sql.builder.impls;
 
 import by.iba.sql.parts.SqlPart;
+import by.iba.sql.parts.child.ExpressionChild;
 
 public class ExpressionBuilder extends SqlBuilder {
 
@@ -33,5 +34,10 @@ public class ExpressionBuilder extends SqlBuilder {
 
 	public BetweenBuilder between() {
 		return new BetweenBuilder(sqlPart);
+	}
+	
+	public ExpressionBuilder innerSql(String sql) {
+		sqlPart.getExpressionChilds().add(new ExpressionChild(sql));
+		return this;
 	}
 }
