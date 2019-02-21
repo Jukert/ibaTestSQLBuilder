@@ -1,14 +1,11 @@
 package by.iba.sql.factory;
 
+import java.util.Map;
+
 import by.iba.sql.builder.impls.SqlBuilder;
 
-public class SqlBuilderFactory {
+public interface SqlBuilderFactory {
 
-	
-	public SqlBuilder build() {
-
-		
-		return null;
-	}
+	public SqlBuilder newSqlBuilder(Map<String, Object> paramMap);
 	
 }

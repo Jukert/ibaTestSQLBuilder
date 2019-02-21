@@ -34,8 +34,9 @@ public class SqlBuilder {
 	public SqlBuilder(Map<String, Object> parameters, DataBase dataBase) {
 		this(parameters, dataBase, null);
 	}
-	
-	public SqlBuilder(Map<String, Object> parameters, DataBase dataBase, Pageable pageable) {
+
+	public SqlBuilder(Map<String, Object> parameters, DataBase dataBase,
+			Pageable pageable) {
 		SqlBuilder.parameters = parameters;
 		SqlBuilder.dataBase = dataBase;
 		sql = new StringBuilder();
@@ -61,13 +62,18 @@ public class SqlBuilder {
 		return sql != null ? sql.toString() : null;
 	}
 
+	public SqlBuilder pageable(Pageable pageable) {
+		this.pageable = pageable;
+		return this;
+	}
+
 	public void limit() {
 		Pageable page = sqlPart.getPageable();
 		String order = sqlPart.getAdditionalPart().getOrder();
-		sqlPart.setAdditionalPart(new AdditionalPart(
-				dataBase.getLimit().getHeaderLimit(), 
-				String.format(dataBase.getLimit().getLimit(), page.getPage(), page.getPerPage()))
-		);
+		sqlPart.setAdditionalPart(new AdditionalPart(dataBase.getLimit()
+				.getHeaderLimit(), String.format(
+				dataBase.getLimit().getLimit(), page.getPage(),
+				page.getPerPage())));
 		sqlPart.getAdditionalPart().setOrder(order);
 	}
 
@@ -83,7 +89,8 @@ public class SqlBuilder {
 		for (int i = 0; i < size; i++) {
 			sb.append(String.format(" %s, ", sort.getOrders().get(i)));
 		}
-		sb.append(sort.getOrders().get(size).getProperty() + " " + sort.getDirection().name());
+		sb.append(sort.getOrders().get(size).getProperty() + " "
+				+ sort.getDirection().name());
 		sqlPart.getAdditionalPart().setOrder(sb.toString());
 		return this;
 	}
@@ -99,16 +106,18 @@ public class SqlBuilder {
 	}
 
 	public String build() throws SQLSyntaxErrorException {
-		if (sqlPart.getPageable() != null){
+		if (sqlPart.getPageable() != null) {
 			orderBy().limit();
 		}
 		String header = sqlPart.getHeaderPart();
 		String limit = sqlPart.getAdditionalPart().getLimit();
 		String headerLimit = sqlPart.getAdditionalPart().getHeaderLimit();
 		String order = sqlPart.getAdditionalPart().getOrder();
-		String additional = (order != null ? order : "") +(limit != null ? limit : "");
+		String additional = (order != null ? order : "")
+				+ (limit != null ? limit : "");
 
-		StringBuilder sb = new StringBuilder(header != null ? (headerLimit + header) : "");
+		StringBuilder sb = new StringBuilder(
+				header != null ? (headerLimit + header) : "");
 
 		List<ExpressionChild> list = SqlBuilder.valid(sqlPart
 				.getExpressionChilds());
@@ -118,7 +127,8 @@ public class SqlBuilder {
 					+ (ex.getOperator() != null ? ex.getOperator() : ""));
 		}
 		if (list == null || list.size() == 0) {
-			return header.contains("WHERE") ? header.replace("WHERE", "") : null;
+			return header.contains("WHERE") ? header.replace("WHERE", "")
+					: null;
 		}
 		sb.append(additional);
 		return sb.toString();
@@ -207,4 +217,13 @@ public class SqlBuilder {
 
 		return expressionChilds;
 	}
+
+	public static DataBase getDataBase() {
+		return dataBase;
+	}
+
+	public static void setDataBase(DataBase dataBase) {
+		SqlBuilder.dataBase = dataBase;
+	}
+
 }

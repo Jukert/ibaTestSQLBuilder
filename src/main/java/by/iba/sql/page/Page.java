@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface Page<T> {
 
-	public int getTotalElement();
+	public long getTotalElement();
 	
 	public List<T> getContent();
 	
